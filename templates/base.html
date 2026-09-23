@@ -1,0 +1,97 @@
+<!-- base.html-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        Laboratory System
+        {% endblock %}
+    </title>
+
+    <!-- Font Awesome Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+    <!-- Main CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <div class="flash-container">
+
+                {% for category, message in messages %}
+
+                    <div class="flash-message {{ category }}">
+
+                        {% if category == "success" %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        {% endif %}
+
+                        <span>{{ message }}</span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    {% block content %}
+    {% endblock %}
+
+
+    <script>
+
+        setTimeout(function () {
+
+            const messages =
+                document.querySelectorAll(
+                    ".flash-message"
+                );
+
+            messages.forEach(function (message) {
+
+                message.style.opacity = "0";
+
+                setTimeout(function () {
+
+                    message.remove();
+
+                }, 500);
+
+            });
+
+        }, 5000);
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Profile | Laboratory System
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+    <div class="profile-card">
+
+        <!-- HEADER -->
+        <div class="profile-header">
+
+            <div class="profile-avatar">
+                {{ username[0]|upper }}
+            </div>
+
+            <div>
+                <span class="section-label">
+                    <i class="fa-solid fa-user"></i>
+                    ACCOUNT
+                </span>
+
+                <h1>
+                    My Profile
+                </h1>
+
+                <p>
+                    View your account information and manage your password.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- PROFILE INFORMATION -->
+        <div class="profile-section">
+
+            <h2>
+                <i class="fa-solid fa-id-card"></i>
+                Account Information
+            </h2>
+
+            {% if profile %}
+
+                <div class="profile-info-grid">
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Username
+                        </span>
+
+                        <strong>
+                            {{ profile[0] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong>
+                            {{ profile[1] }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Role
+                        </span>
+
+                        <strong>
+                            {{ profile[2]|capitalize }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Account Status
+                        </span>
+
+                        <strong class="account-status">
+
+                            {% if profile[3] %}
+                                <i class="fa-solid fa-circle-check"></i>
+                                Verified
+                            {% else %}
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                Not Verified
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <p>
+                    Unable to load your profile information.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- CHANGE PASSWORD -->
+        <div class="profile-section">
+
+            <h2>
+                <i class="fa-solid fa-lock"></i>
+                Change Password
+            </h2>
+
+            <p class="profile-description">
+                Enter your current password and choose a new password.
+            </p>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('profile') }}"
+                class="password-form"
+            >
+
+                <div class="form-group">
+
+                    <label for="old_password">
+                        Current Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="old_password"
+                        name="old_password"
+                        placeholder="Enter current password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="new_password">
+                        New Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="new_password"
+                        name="new_password"
+                        placeholder="Enter new password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="confirm_password">
+                        Confirm New Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Confirm new password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="password-requirements">
+
+                    <strong>
+                        Password requirements:
+                    </strong>
+
+                    <ul>
+
+                        <li>
+                            At least 8 characters
+                        </li>
+
+                        <li>
+                            At least one uppercase letter
+                        </li>
+
+                        <li>
+                            At least one number
+                        </li>
+
+                        <li>
+                            At least one special character
+                            (@#$%^&*)
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <div class="profile-actions">
+
+                    <a
+                        href="{{ url_for('dashboard') }}"
+                        class="secondary-button"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+                        <i class="fa-solid fa-key"></i>
+                        Change Password
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}
+Verify Account | Laboratory System
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <div class="logo-box">
+                LAB
+            </div>
+            <h1>Verify Account</h1>
+            <p>Enter your 6-digit verification code</p>
+        </div>
+
+        {% if verification_code %}
+        <div class="verification-code-card" role="status">
+            <div class="verification-code-icon">✓</div>
+            <h2>Account Created!</h2>
+            <p>
+                Your account was created successfully. For this project version,
+                your verification code is displayed here.
+            </p>
+
+            <div class="verification-code-label">
+                Verification Code
+            </div>
+
+            <div class="verification-code-value">
+                {{ verification_code }}
+            </div>
+
+            <p class="verification-code-note">
+                Enter this 6-digit code below to verify your account.
+            </p>
+        </div>
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                    id="username"
+                    type="text"
+                    name="username"
+                    value="{{ username }}"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="verification_code">Verification Code</label>
+                <input
+                    id="verification_code"
+                    type="text"
+                    name="verification_code"
+                    class="otp-input"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    inputmode="numeric"
+                    placeholder="000000"
+                    autocomplete="one-time-code"
+                    value=""
+                    required
+                >
+            </div>
+
+            <button type="submit" class="primary-button full-button">
+                Verify Account
+            </button>
+        </form>
+
+        <div class="auth-links">
+            <a href="{{ url_for('login') }}">Back to Login</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

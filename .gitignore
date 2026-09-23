@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Local SQLite database
+hardware_inventory.db
+
+# Logs
+app_logging/
+*.log
+
+# Local reports / generated files
+*.csv

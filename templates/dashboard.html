@@ -1,0 +1,2316 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Dashboard | Laboratory System
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="dashboard-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="sidebar-logo">
+
+            <div class="sidebar-logo-icon">
+
+                <i class="fa-solid fa-flask"></i>
+
+            </div>
+
+
+            <div>
+
+                <h2>
+                    Laboratory
+                </h2>
+
+                <span>
+                    Management System
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="#dashboard"
+                class="nav-link active"
+            >
+
+                <i class="fa-solid fa-house"></i>
+
+                Dashboard
+
+            </a>
+
+
+            <a
+                href="#inventory"
+                class="nav-link"
+            >
+
+                <i class="fa-solid fa-cube"></i>
+
+                Inventory
+
+            </a>
+
+
+            {% if role != "admin" %}
+
+            <a
+                href="#reservations"
+                class="nav-link"
+            >
+
+                <i class="fa-solid fa-calendar-check"></i>
+
+                Reservations
+
+            </a>
+
+
+            <a
+                href="#borrowed"
+                class="nav-link"
+            >
+
+                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+
+                Borrowed Items
+
+            </a>
+
+            {% endif %}
+
+
+            {% if role == "admin" %}
+
+            <a
+                href="#admin-panel"
+                class="nav-link"
+            >
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Admin Panel
+
+            </a>
+
+            {% endif %}
+
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebar-bottom">
+
+
+            <a
+                href="{{ url_for('profile') }}"
+                class="sidebar-user profile-link"
+            >
+
+                <div class="user-avatar">
+
+                    {{ username[0]|upper }}
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        {{ username }}
+                    </strong>
+
+                    <span>
+
+                        {{ role|capitalize }}
+
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="logout-button"
+            >
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                Logout
+
+            </a>
+
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <header class="topbar">
+
+
+            <div class="mobile-title">
+
+                <i class="fa-solid fa-flask"></i>
+
+                Laboratory System
+
+            </div>
+
+
+            <div class="topbar-right">
+
+
+                <div class="notification-icon">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                </div>
+
+
+                <div class="top-user">
+
+                    <div class="top-avatar">
+
+                        {{ username[0]|upper }}
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            {{ username }}
+                        </strong>
+
+                        <small>
+                            {{ role|capitalize }}
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+        <!-- =================================================
+             DASHBOARD
+        ================================================== -->
+
+        <section
+            id="dashboard"
+            class="dashboard-section"
+        >
+
+
+            <!-- WELCOME BANNER -->
+
+            <div class="welcome-banner">
+
+
+                <div class="welcome-content">
+
+
+                    <span class="welcome-label">
+
+                        <i class="fa-solid fa-flask"></i>
+
+                        ENGINEERING LABORATORY
+
+                    </span>
+
+
+                    <h1>
+
+                        Welcome back,
+                        {{ username }}!
+
+                    </h1>
+
+
+                    <p>
+
+                        Manage laboratory equipment,
+                        reservations, and inventory
+                        in one organized system.
+
+                    </p>
+
+
+                    <a
+                        href="#inventory"
+                        class="welcome-button"
+                    >
+
+                        View Inventory
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+
+                </div>
+
+
+                <div class="welcome-icon">
+
+                    <i class="fa-solid fa-microscope"></i>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 STATISTICS
+            ================================================== -->
+
+            <div class="stats-grid">
+
+
+                <!-- TOTAL STOCKS -->
+
+                <div class="stat-card">
+
+
+                    <div class="stat-icon blue">
+
+                        <i class="fa-solid fa-boxes-stacked"></i>
+
+                    </div>
+
+
+                    <div class="stat-info">
+
+                        <span>
+
+                            Total Stocks
+
+                        </span>
+
+
+                        <h2>
+
+                            {{ total_stocks }}
+
+                        </h2>
+
+
+                        <small>
+
+                            Available equipment
+
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- PENDING -->
+
+                <div class="stat-card">
+
+
+                    <div class="stat-icon orange">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                    </div>
+
+
+                    <div class="stat-info">
+
+                        <span>
+
+                            Pending Requests
+
+                        </span>
+
+
+                        <h2>
+
+                            {% if role == "admin" %}
+                            {{ admin_pending_count }}
+                            {% else %}
+                            {{ pending_requests|length }}
+                            {% endif %}
+
+                        </h2>
+
+
+                        <small>
+
+                            Reservation requests
+
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- BORROWED -->
+
+                <div class="stat-card">
+
+
+                    <div class="stat-icon purple">
+
+                        <i class="fa-solid fa-hand-holding"></i>
+
+                    </div>
+
+
+                    <div class="stat-info">
+
+                        <span>
+
+                            Borrowed Items
+
+                        </span>
+
+
+                        <h2>
+
+                            {% if role == "admin" %}
+                            {{ admin_borrowed_count }}
+                            {% else %}
+                            {{ borrowed_items|length }}
+                            {% endif %}
+
+                        </h2>
+
+
+                        <small>
+
+                            Currently borrowed
+
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- APPROVED -->
+
+                <div class="stat-card">
+
+
+                    <div class="stat-icon green">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                    </div>
+
+
+                    <div class="stat-info">
+
+                        <span>
+
+                            Approved
+
+                        </span>
+
+
+                        <h2>
+
+                            {% if role == "admin" %}
+                            {{ admin_approved_count }}
+                            {% else %}
+                            {{ approved_reservations|length }}
+                            {% endif %}
+
+                        </h2>
+
+
+                        <small>
+
+                            Approved reservations
+
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 INVENTORY
+            ================================================== -->
+
+            <section
+                id="inventory"
+                class="content-card"
+            >
+
+
+                <div class="section-header">
+
+
+                    <div>
+
+                        <span class="section-label">
+
+                            <i class="fa-solid fa-cube"></i>
+
+                            EQUIPMENT MANAGEMENT
+
+                        </span>
+
+
+                        <h2>
+
+                            Hardware Inventory
+
+                        </h2>
+
+
+                        <p>
+
+                            Search and manage
+                            laboratory equipment.
+
+                        </p>
+
+                    </div>
+
+
+                    {% if role == "admin" %}
+
+                    <a
+                        href="#add-equipment"
+                        class="add-button"
+                    >
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add Equipment
+
+                    </a>
+
+                    {% endif %}
+
+
+                </div>
+
+
+                <!-- SEARCH -->
+
+                <form
+                    method="GET"
+                    action="{{ url_for('dashboard') }}"
+                    class="search-form"
+                >
+
+
+                    <div class="search-input">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="Search items or categories..."
+                        >
+
+                    </div>
+
+
+                    <select name="category">
+
+                        <option value="All Categories">
+
+                            All Categories
+
+                        </option>
+
+
+                        {% for cat in categories %}
+
+                        <option
+                            value="{{ cat }}"
+                            {% if selected_category == cat %}
+                            selected
+                            {% endif %}
+                        >
+
+                            {{ cat }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <button
+                        type="submit"
+                        class="search-button"
+                    >
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        Search
+
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('dashboard') }}"
+                        class="clear-button"
+                    >
+
+                        Clear
+
+                    </a>
+
+
+                </form>
+
+
+                <!-- INVENTORY TABLE -->
+
+                <div class="table-wrapper">
+
+
+                    <table class="modern-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+
+                                    Equipment
+
+                                </th>
+
+                                <th>
+
+                                    Category
+
+                                </th>
+
+                                <th>
+
+                                    Quantity
+
+                                </th>
+
+                                <th>
+
+                                    Unit Price
+
+                                </th>
+
+                                <th>
+
+                                    Status
+
+                                </th>
+
+                                <th>
+
+                                    Actions
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for item in items %}
+
+                            <tr>
+
+
+                                <!-- EQUIPMENT -->
+
+                                <td>
+
+                                    <div class="equipment-info">
+
+
+                                        <div class="equipment-icon">
+
+                                            <i class="fa-solid fa-microchip"></i>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <strong>
+
+                                                {{ item[1] }}
+
+                                            </strong>
+
+
+                                            <small>
+
+                                                ID: {{ item[0] }}
+
+                                            </small>
+
+                                        </div>
+
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- CATEGORY -->
+
+                                <td>
+
+                                    <span class="category-badge">
+
+                                        {{ item[2] }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- QUANTITY -->
+
+                                <td>
+
+                                    <strong>
+
+                                        {{ item[3] }}
+
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- PRICE -->
+
+                                <td>
+
+                                    ₱{{ "%.2f"|format(item[4]) }}
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    {% if item[5] == "In Stock" %}
+
+                                    <span class="status-badge in-stock">
+
+                                        In Stock
+
+                                    </span>
+
+
+                                    {% elif item[5] == "Low Stock" %}
+
+                                    <span class="status-badge low-stock">
+
+                                        Low Stock
+
+                                    </span>
+
+
+                                    {% else %}
+
+                                    <span class="status-badge">
+
+                                        {{ item[5] }}
+
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+
+                                    {% if role == "admin" %}
+
+
+                                    <div class="action-buttons">
+
+
+                                        <!-- EDIT -->
+
+                                        <button
+                                            type="button"
+                                            class="icon-button edit"
+                                            onclick="openEditModal(
+                                                '{{ item[0] }}',
+                                                '{{ item[1] }}',
+                                                '{{ item[3] }}',
+                                                '{{ item[4] }}'
+                                            )"
+                                        >
+
+                                            <i class="fa-solid fa-pen"></i>
+
+                                        </button>
+
+
+                                        <!-- DELETE -->
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'delete_item',
+                                                item_id=item[0]
+                                            ) }}"
+                                            onsubmit="
+                                                return confirm(
+                                                    'Delete this equipment?'
+                                                )
+                                            "
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="icon-button delete"
+                                            >
+
+                                                <i class="fa-solid fa-trash"></i>
+
+                                            </button>
+
+                                        </form>
+
+
+                                    </div>
+
+
+                                    {% else %}
+
+
+                                    <button
+                                        type="button"
+                                        class="reserve-button"
+                                        onclick="openReserveModal(
+                                            '{{ item[0] }}',
+                                            '{{ item[1] }}',
+                                            '{{ item[3] }}'
+                                        )"
+                                    >
+
+                                        Reserve
+
+                                    </button>
+
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                            {% else %}
+
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="empty-table"
+                                >
+
+                                    <i class="fa-solid fa-box-open"></i>
+
+                                    <p>
+
+                                        No equipment found.
+
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+                <div class="table-footer">
+
+                    <span>
+
+                        Showing
+                        {{ items|length }}
+                        equipment item(s)
+
+                    </span>
+
+
+                    <a
+                        href="{{ url_for('export') }}"
+                        class="export-button"
+                    >
+
+                        <i class="fa-solid fa-file-csv"></i>
+
+                        Export CSV
+
+                    </a>
+
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 USER RESERVATIONS
+            ================================================== -->
+
+            {% if role != "admin" %}
+
+            <section
+                id="reservations"
+                class="content-card"
+            >
+
+
+                <div class="section-header">
+
+
+                    <div>
+
+                        <span class="section-label">
+
+                            <i class="fa-solid fa-calendar-check"></i>
+
+                            RESERVATION MANAGEMENT
+
+                        </span>
+
+
+                        <h2>
+
+                            My Reservations
+
+                        </h2>
+
+
+                        <p>
+
+                            View your equipment
+                            reservation requests.
+
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+
+                    <table class="modern-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+
+                                    Reservation
+
+                                </th>
+
+                                <th>
+
+                                    Item Name
+
+                                </th>
+
+                                <th>
+
+                                    Quantity
+
+                                </th>
+
+                                <th>
+
+                                    Date
+
+                                </th>
+
+                                <th>
+
+                                    Time
+
+                                </th>
+
+                                <th>
+
+                                    Status
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for reservation in user_reservations %}
+
+                            <tr>
+
+                                <td>
+
+                                    #{{ reservation[0] }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ reservation[1] }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ reservation[2] }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ reservation[3] }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ reservation[4] }}
+                                    -
+                                    {{ reservation[5] }}
+
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="status-badge
+                                        {% if reservation[7] == 'Pending' %}
+                                        pending
+                                        {% elif reservation[7] == 'Approved' %}
+                                        approved
+                                        {% elif reservation[7] == 'Borrowed' %}
+                                        borrowed
+                                        {% endif %}"
+                                    >
+
+                                        {{ reservation[7] }}
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            {% else %}
+
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="empty-table"
+                                >
+
+                                    <i class="fa-solid fa-calendar-xmark"></i>
+
+                                    <p>
+
+                                        No reservation records yet.
+
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </section>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 BORROWED ITEMS
+            ================================================== -->
+
+            {% if role != "admin" %}
+
+            <section
+                id="borrowed"
+                class="content-card"
+            >
+
+
+                <div class="section-header">
+
+
+                    <div>
+
+                        <span class="section-label">
+
+                            <i class="fa-solid fa-hand-holding"></i>
+
+                            EQUIPMENT TRACKING
+
+                        </span>
+
+
+                        <h2>
+
+                            Borrowed Equipment
+
+                        </h2>
+
+
+                        <p>
+
+                            Equipment currently borrowed
+                            under your account.
+
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="borrowed-grid">
+
+
+                    {% for item in borrowed_items %}
+
+
+                    <div class="borrow-card">
+
+
+                        <div class="borrow-icon">
+
+                            <i class="fa-solid fa-box"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h3>
+
+                                {{ item[1] }}
+
+                            </h3>
+
+
+                            <p>
+
+                                Quantity:
+                                {{ item[2] }}
+
+                            </p>
+
+
+                            <span>
+
+                                Borrowed
+
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    {% else %}
+
+
+                    <div class="empty-borrowed">
+
+                        <i class="fa-solid fa-box-open"></i>
+
+
+                        <h3>
+
+                            No Borrowed Items
+
+                        </h3>
+
+
+                        <p>
+
+                            You currently have no
+                            borrowed equipment.
+
+                        </p>
+
+                    </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            </section>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 ADMIN PANEL
+            ================================================== -->
+
+            {% if role == "admin" %}
+
+
+            <section
+                id="admin-panel"
+                class="admin-section"
+            >
+
+
+                <div class="admin-title">
+
+
+                    <div>
+
+                        <span>
+
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                            ADMINISTRATOR
+
+                        </span>
+
+
+                        <h2>
+
+                            Administration Panel
+
+                        </h2>
+
+
+                        <p>
+
+                            Manage equipment,
+                            reservation requests,
+                            and system accounts.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="admin-badge">
+
+                        ADMIN
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ADD EQUIPMENT -->
+
+                <div
+                    id="add-equipment"
+                    class="admin-card"
+                >
+
+
+                    <h3>
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add New Equipment
+
+                    </h3>
+
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('add_item') }}"
+                        class="equipment-form"
+                    >
+
+
+                        <div class="form-group">
+
+                            <label>
+
+                                Item Name
+
+                            </label>
+
+
+                            <input
+                                type="text"
+                                name="item_name"
+                                placeholder="Example: Arduino Uno"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+
+                                Category
+
+                            </label>
+
+
+                            <input
+                                type="text"
+                                name="category"
+                                placeholder="Example: Microcontroller"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+
+                                Quantity
+
+                            </label>
+
+
+                            <input
+                                type="number"
+                                name="quantity"
+                                min="0"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+
+                                Unit Price
+
+                            </label>
+
+
+                            <input
+                                type="number"
+                                name="unit_price"
+                                step="0.01"
+                                min="0"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+
+                            <i class="fa-solid fa-plus"></i>
+
+                            Add Equipment
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+                <!-- ADMIN RESERVATIONS -->
+
+                <div class="admin-card">
+
+
+                    <h3>
+
+                        <i class="fa-solid fa-list-check"></i>
+
+                        All Reservation Requests
+
+                    </h3>
+
+
+                    <div class="table-wrapper">
+
+
+                        <table class="modern-table">
+
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+
+                                        ID
+
+                                    </th>
+
+                                    <th>
+
+                                        User
+
+                                    </th>
+
+                                    <th>
+
+                                        Item Name
+
+                                    </th>
+
+                                    <th>
+
+                                        Quantity
+
+                                    </th>
+
+                                    <th>
+
+                                        Date
+
+                                    </th>
+
+                                    <th>
+
+                                        Status
+
+                                    </th>
+
+                                    <th>
+
+                                        Action
+
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                {% for reservation in all_reservations %}
+
+
+                                <tr>
+
+
+                                    <td>
+
+                                        #{{ reservation[0] }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ reservation[1] }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ reservation[2] }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ reservation[4] }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ reservation[5] }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status-badge">
+
+                                            {{ reservation[9] }}
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+
+                                        {% if reservation[9] == "Pending" %}
+
+                                        <div class="admin-actions">
+                                            <form method="POST" action="{{ url_for('process_reservation', reservation_id=reservation[0]) }}">
+                                                <input type="hidden" name="action" value="approve">
+                                                <button type="submit" class="approve-button">Approve</button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('process_reservation', reservation_id=reservation[0]) }}">
+                                                <input type="hidden" name="action" value="reject">
+                                                <button type="submit" class="reject-button">Reject</button>
+                                            </form>
+                                        </div>
+
+                                        {% elif reservation[9] == "Approved" %}
+
+                                        <form method="POST" action="{{ url_for('mark_borrowed', reservation_id=reservation[0]) }}" class="admin-actions">
+                                            <input type="date" name="expected_return" required>
+                                            <button type="submit" class="approve-button">Mark as Borrowed</button>
+                                        </form>
+
+                                        {% elif reservation[9] == "Borrowed" %}
+
+                                        <form method="POST" action="{{ url_for('return_item', reservation_id=reservation[0]) }}" class="admin-actions">
+                                            <select name="condition" required>
+                                                <option value="">Condition</option>
+                                                <option value="Good">Good</option>
+                                                <option value="Damaged">Damaged</option>
+                                                <option value="Lost">Lost</option>
+                                            </select>
+                                            <input type="text" name="remarks" placeholder="Remarks">
+                                            <button type="submit" class="approve-button">Process Return</button>
+                                        </form>
+
+                                        {% else %}
+
+                                        <span class="action-complete">Processed</span>
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                </tr>
+
+
+                                {% else %}
+
+
+                                <tr>
+
+                                    <td
+                                        colspan="7"
+                                        class="empty-table"
+                                    >
+
+                                        No reservation requests.
+
+                                    </td>
+
+                                </tr>
+
+
+                                {% endfor %}
+
+
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ADMIN PASSWORD RESET REQUESTS -->
+
+                <div class="admin-card">
+
+
+                    <h3>
+
+                        <i class="fa-solid fa-key"></i>
+
+                        Password Reset Requests
+
+                    </h3>
+
+
+                    <div class="table-wrapper">
+
+
+                        <table class="modern-table">
+
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+
+                                        ID
+
+                                    </th>
+
+                                    <th>
+
+                                        User
+
+                                    </th>
+
+                                    <th>
+
+                                        Email
+
+                                    </th>
+
+                                    <th>
+
+                                        Status
+
+                                    </th>
+
+                                    <th>
+
+                                        Action
+
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                {% for req in reset_requests %}
+
+
+                                <tr>
+
+
+                                    <td>
+
+                                        #{{ req[0] }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ req[1] }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ req[2] if req|length > 2 else "N/A" }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status-badge">
+
+                                            {{ req[3] if req|length > 3 else "Pending" }}
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+
+                                        {% if req[3] == "Pending" or req|length <= 3 %}
+
+                                        <div class="admin-actions">
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('process_reset_request', request_id=req[0]) }}"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="approve"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="approve-button"
+                                                >
+
+                                                    Approve
+
+                                                </button>
+
+                                            </form>
+
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('process_reset_request', request_id=req[0]) }}"
+                                            >
+
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="reject"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="reject-button"
+                                                >
+
+                                                    Reject
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                        {% else %}
+
+                                        <span class="action-complete">
+
+                                            Processed
+
+                                        </span>
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                </tr>
+
+
+                                {% else %}
+
+
+                                <tr>
+
+                                    <td
+                                        colspan="5"
+                                        class="empty-table"
+                                    >
+
+                                        No password reset requests pending.
+
+                                    </td>
+
+                                </tr>
+
+
+                                {% endfor %}
+
+
+                            </tbody>
+
+
+                        </table>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+<!-- =====================================================
+     RESERVATION MODAL
+====================================================== -->
+
+<div
+    id="reserveModal"
+    class="modal"
+>
+
+
+    <div class="modal-content">
+
+
+        <button
+            class="modal-close"
+            onclick="closeReserveModal()"
+        >
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <div class="modal-header">
+
+            <div class="modal-icon">
+
+                <i class="fa-solid fa-calendar-plus"></i>
+
+            </div>
+
+
+            <h2>
+
+                Reserve Equipment
+
+            </h2>
+
+
+            <p
+                id="reserveItemName"
+            >
+
+            </p>
+
+
+        </div>
+
+
+        <form
+            id="reserveForm"
+            method="POST"
+        >
+
+
+            <div class="form-row">
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        Quantity
+
+                    </label>
+
+
+                    <input
+                        type="number"
+                        name="quantity"
+                        id="reserveQuantity"
+                        value="1"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        Reservation Date
+
+                    </label>
+
+
+                    <input
+                        type="date"
+                        name="reservation_date"
+                        required
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <div class="form-row">
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        Start Time
+
+                    </label>
+
+
+                    <input
+                        type="time"
+                        name="start_time"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+
+                        End Time
+
+                    </label>
+
+
+                    <input
+                        type="time"
+                        name="end_time"
+                        required
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Purpose
+
+                </label>
+
+
+                <textarea
+                    name="purpose"
+                    placeholder="Enter the purpose of reservation..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Remarks
+
+                </label>
+
+
+                <textarea
+                    name="remarks"
+                    placeholder="Optional remarks..."
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-button full-button"
+            >
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+                Submit Reservation
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     EDIT EQUIPMENT MODAL
+====================================================== -->
+
+<div
+    id="editModal"
+    class="modal"
+>
+
+
+    <div class="modal-content small-modal">
+
+
+        <button
+            class="modal-close"
+            onclick="closeEditModal()"
+        >
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <div class="modal-header">
+
+            <div class="modal-icon blue-icon">
+
+                <i class="fa-solid fa-pen"></i>
+
+            </div>
+
+
+            <h2>
+
+                Update Equipment
+
+            </h2>
+
+
+            <p
+                id="editItemName"
+            >
+
+            </p>
+
+
+        </div>
+
+
+        <form
+            id="editForm"
+            method="POST"
+        >
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Quantity
+
+                </label>
+
+
+                <input
+                    type="number"
+                    name="quantity"
+                    id="editQuantity"
+                    min="0"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Unit Price
+
+                </label>
+
+
+                <input
+                    type="number"
+                    name="unit_price"
+                    id="editPrice"
+                    step="0.01"
+                    min="0"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-button full-button"
+            >
+
+                Update Equipment
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script>
+
+
+    function openReserveModal(
+        itemId,
+        itemName,
+        quantity
+    ) {
+
+        document.getElementById(
+            "reserveModal"
+        ).style.display = "flex";
+
+
+        document.getElementById(
+            "reserveItemName"
+        ).innerText =
+            itemName +
+            " • Available: " +
+            quantity;
+
+
+        document.getElementById(
+            "reserveQuantity"
+        ).max = quantity;
+
+
+        document.getElementById(
+            "reserveForm"
+        ).action =
+            "/reserve/" +
+            itemId;
+
+    }
+
+
+    function closeReserveModal() {
+
+        document.getElementById(
+            "reserveModal"
+        ).style.display = "none";
+
+    }
+
+
+    function openEditModal(
+        itemId,
+        itemName,
+        quantity,
+        price
+    ) {
+
+        document.getElementById(
+            "editModal"
+        ).style.display = "flex";
+
+
+        document.getElementById(
+            "editItemName"
+        ).innerText = itemName;
+
+
+        document.getElementById(
+            "editQuantity"
+        ).value = quantity;
+
+
+        document.getElementById(
+            "editPrice"
+        ).value = price;
+
+
+        document.getElementById(
+            "editForm"
+        ).action =
+            "/admin/update-item/" +
+            itemId;
+
+    }
+
+
+    function closeEditModal() {
+
+        document.getElementById(
+            "editModal"
+        ).style.display = "none";
+
+    }
+
+
+    window.onclick = function(event) {
+
+        const reserveModal =
+            document.getElementById(
+                "reserveModal"
+            );
+
+
+        const editModal =
+            document.getElementById(
+                "editModal"
+            );
+
+
+        if (
+            event.target === reserveModal
+        ) {
+
+            closeReserveModal();
+
+        }
+
+
+        if (
+            event.target === editModal
+        ) {
+
+            closeEditModal();
+
+        }
+
+    };
+
+</script>
+
+
+{% endblock %}
