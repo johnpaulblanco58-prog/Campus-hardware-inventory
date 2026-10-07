@@ -4,6 +4,7 @@ import os
 import re
 import random
 import smtplib
+import requests
 
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
@@ -66,10 +67,22 @@ BREVO_SENDER_EMAIL = os.getenv(
     "BREVO_SENDER_EMAIL"
 )
 
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+
 def send_otp_email(receiver_email, otp, intent="Account Verification"):
 
-    message = MIMEText(
-        f"""Hello,
+    message_data = {
+        "sender": {
+            "name": "Laboratory System",
+            "email": BREVO_SENDER_EMAIL
+        },
+        "to": [
+            {
+                "email": receiver_email
+            }
+        ],
+        "subject": f"Laboratory System - {intent} OTP",
+        "textContent": f"""Hello,
 
 Your One-Time Password (OTP) for the Laboratory System is:
 
@@ -81,38 +94,34 @@ Please do not share this code with anyone.
 
 Thank you,
 Laboratory System"""
-    )
-
-    message["Subject"] = (
-        f"Laboratory System - {intent} OTP"
-    )
-
-    message["From"] = BREVO_SENDER_EMAIL
-    message["To"] = receiver_email
+    }
 
     try:
 
-        with smtplib.SMTP(
-            SMTP_SERVER,
-            SMTP_PORT
-        ) as server:
-
-            server.starttls()
-
-            server.login(
-                SMTP_LOGIN,
-                SMTP_PASSWORD
-            )
-
-            server.send_message(
-                message
-            )
-
-        logger.info(
-            f"OTP email sent successfully to {receiver_email}."
+        response = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers={
+                "accept": "application/json",
+                "api-key": BREVO_API_KEY,
+                "content-type": "application/json"
+            },
+            json=message_data,
+            timeout=15
         )
 
-        return True
+        if response.status_code in (200, 201, 202):
+
+            logger.info(
+                f"OTP email sent successfully to {receiver_email}."
+            )
+
+            return True
+
+        logger.error(
+            f"Brevo API error: {response.status_code} - {response.text}"
+        )
+
+        return False
 
     except Exception as e:
 
