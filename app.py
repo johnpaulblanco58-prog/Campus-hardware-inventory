@@ -2,6 +2,11 @@
 
 import os
 import re
+import random
+import smtplib
+
+from email.mime.text import MIMEText
+from dotenv import load_dotenv
 
 from functools import wraps
 
@@ -15,6 +20,8 @@ from flask import (
     flash,
     send_file
 )
+
+from logger import logger
 
 from models.database import init_db
 
@@ -31,7 +38,89 @@ BASE_DIR = os.path.dirname(
     os.path.abspath(__file__)
 )
 
+load_dotenv(
+    os.path.join(BASE_DIR, ".env")
+)
 
+SMTP_SERVER = os.getenv(
+    "SMTP_SERVER",
+    "smtp-relay.brevo.com"
+)
+
+SMTP_PORT = int(
+    os.getenv(
+        "SMTP_PORT",
+        "587"
+    )
+)
+
+SMTP_LOGIN = os.getenv(
+    "SMTP_LOGIN"
+)
+
+SMTP_PASSWORD = os.getenv(
+    "SMTP_PASSWORD"
+)
+
+BREVO_SENDER_EMAIL = os.getenv(
+    "BREVO_SENDER_EMAIL"
+)
+
+def send_otp_email(receiver_email, otp, intent="Account Verification"):
+
+    message = MIMEText(
+        f"""Hello,
+
+Your One-Time Password (OTP) for the Laboratory System is:
+
+{otp}
+
+This code is for {intent}.
+
+Please do not share this code with anyone.
+
+Thank you,
+Laboratory System"""
+    )
+
+    message["Subject"] = (
+        f"Laboratory System - {intent} OTP"
+    )
+
+    message["From"] = BREVO_SENDER_EMAIL
+    message["To"] = receiver_email
+
+    try:
+
+        with smtplib.SMTP(
+            SMTP_SERVER,
+            SMTP_PORT
+        ) as server:
+
+            server.starttls()
+
+            server.login(
+                SMTP_LOGIN,
+                SMTP_PASSWORD
+            )
+
+            server.send_message(
+                message
+            )
+
+        logger.info(
+            f"OTP email sent successfully to {receiver_email}."
+        )
+
+        return True
+
+    except Exception as e:
+
+        logger.error(
+            f"OTP email error: {e}"
+        )
+
+        return False
 # =========================================================
 # FLASK APPLICATION
 # =========================================================
@@ -254,8 +343,6 @@ def register():
 
             session["verify_username"] = username
 
-            # For this classroom/project version, show the verification
-            # code directly in the web interface instead of sending email.
             code_match = re.search(
                 r"verification code is:\s*(\d{6})",
                 message,
@@ -263,15 +350,45 @@ def register():
             )
 
             if code_match:
-                session["verification_code"] = code_match.group(1)
+
+                verification_code = code_match.group(1)
+
+                if send_otp_email(
+                    email,
+                    verification_code,
+                    intent="Account Verification"
+                ):
+
+            # Do NOT store the OTP in the session anymore.
+            # The user must get it from their email.
+
+                    flash(
+                        "Account created successfully. A 6-digit verification code has been sent to your email.",
+                        "success"
+                    )
+
+                    return redirect(
+                        url_for("verify")
+                    )
+
+                else:
+
+                    flash(
+                        "Account was created, but the verification email could not be sent. Please try again.",
+                        "danger"
+                    )
+
+                    return redirect(
+                        url_for("register")
+                    )
 
             flash(
-                "Account created successfully. Your verification code is shown on the verification page.",
-                "success"
+                "Account created, but no verification code was generated.",
+                "danger"
             )
 
             return redirect(
-                url_for("verify")
+                url_for("register")
             )
 
         flash(
@@ -353,7 +470,7 @@ def verify():
     )
 
     return render_template(
-        "verify.html",
+        "otp_verify.html",
         username=username,
         verification_code=verification_code
     )

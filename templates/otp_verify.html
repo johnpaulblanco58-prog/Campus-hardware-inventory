@@ -1,0 +1,370 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Verify Account - Laboratory System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(
+                120deg,
+                #18284f 0%,
+                #1f3f91 50%,
+                #2f67e8 100%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background decorative circles */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.07);
+            top: -220px;
+            left: -100px;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            bottom: -300px;
+            right: -100px;
+        }
+
+        .otp-card {
+            position: relative;
+            z-index: 2;
+            width: 460px;
+            max-width: calc(100% - 40px);
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 44px 40px 38px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.20);
+        }
+
+        /* LAB logo */
+        .logo {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 18px;
+            border-radius: 18px;
+            background: linear-gradient(
+                135deg,
+                #2863e8,
+                #244bb8
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 5px 12px rgba(36, 75, 184, 0.25);
+        }
+
+        .title {
+            text-align: center;
+            margin: 0;
+            color: #111827;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin: 9px 0 30px;
+            color: #667085;
+            font-size: 14px;
+        }
+
+        .verification-title {
+            text-align: center;
+            color: #172554;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            text-align: center;
+            color: #667085;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 auto 25px;
+            max-width: 340px;
+        }
+
+        /* Flash messages */
+        .message {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .success {
+            background: #e8f8ee;
+            color: #16803c;
+        }
+
+        .danger {
+            background: #fdecec;
+            color: #c62828;
+        }
+
+        /* Form labels */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1f2937;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Inputs */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .username-input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            border: 1px solid #d6deeb;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #344054;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .username-input:focus {
+            border-color: #2863e8;
+            box-shadow: 0 0 0 3px rgba(40, 99, 232, 0.10);
+        }
+
+        /* OTP input */
+        .otp-input {
+            width: 100%;
+            height: 58px;
+            padding: 0 15px;
+            border: 1px solid #d6deeb;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #172554;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 9px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .otp-input::placeholder {
+            color: #b8c1d1;
+            letter-spacing: 8px;
+        }
+
+        .otp-input:focus {
+            border-color: #2863e8;
+            box-shadow: 0 0 0 3px rgba(40, 99, 232, 0.10);
+        }
+
+        /* Verify button */
+        .verify-button {
+            width: 100%;
+            height: 42px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 8px;
+            background: #2863e8;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .verify-button:hover {
+            background: #1f54cf;
+        }
+
+        .verify-button:active {
+            transform: scale(0.99);
+        }
+
+        /* Bottom links */
+        .bottom-links {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+        }
+
+        .bottom-links a {
+            color: #1456e8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .bottom-links a:hover {
+            text-decoration: underline;
+        }
+
+        .separator {
+            color: #c5cbd6;
+            margin: 0 10px;
+        }
+
+        /* Mobile */
+        @media (max-width: 520px) {
+            .otp-card {
+                padding: 35px 25px 30px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .logo {
+                width: 68px;
+                height: 68px;
+            }
+
+            .otp-input {
+                font-size: 22px;
+                letter-spacing: 7px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="otp-card">
+
+        <!-- LAB Logo -->
+        <div class="logo">
+            LAB
+        </div>
+
+        <!-- Main Heading -->
+        <h1 class="title">
+            Laboratory System
+        </h1>
+
+        <p class="subtitle">
+            Engineering Laboratory Asset Management
+        </p>
+
+        <!-- Verification Heading -->
+        <h2 class="verification-title">
+            Verify Your Account
+        </h2>
+
+        <p class="description">
+            A 6-digit verification code has been sent to your
+            registered email address. Enter the code below to
+            complete your account verification.
+        </p>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Verification Form -->
+        <form method="POST" action="{{ url_for('verify') }}">
+
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    class="username-input"
+                    value="{{ username }}"
+                    placeholder="Enter your username"
+                    required
+                >
+            </div>
+
+            <!-- OTP -->
+            <div class="form-group">
+                <label for="verification_code">
+                    Verification Code
+                </label>
+
+                <input
+                    type="text"
+                    id="verification_code"
+                    name="verification_code"
+                    class="otp-input"
+                    placeholder="000000"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    required
+                >
+            </div>
+
+            <!-- Verify -->
+            <button
+                type="submit"
+                class="verify-button"
+            >
+                Verify Account
+            </button>
+
+        </form>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-links">
+            <a href="{{ url_for('login') }}">
+                Back to Sign In
+            </a>
+
+            <span class="separator">|</span>
+
+            <a href="{{ url_for('register') }}">
+                Create Account
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>
